@@ -25,8 +25,185 @@ package SmoothProb;
 use strict;
 use English '-no_match_vars';
 use Strip;
-use Math::Interpolate 'linear_interpolate';#, 'constant_interpolate';
+#use Math::Interpolate 'linear_interpolate';#, 'constant_interpolate';
+#use Math::IntervalSearch qw(interval_search);
+use Carp;
 
+sub cluck { warn Carp::longmess @_ }
+
+sub LessThan {
+  $_[0] < $_[1];
+}
+
+sub LessThanEqualTo {
+  $_[0] <= $_[1];
+}
+
+# This holds the result from the last interval search.
+my $last_interval_result = undef;
+
+sub interval_search {
+  if ( @_ > 4 ) {
+    cluck "interval called with too many parameters";
+    return;
+  }
+
+  # Get the input arguments.
+  my $x           = shift;
+  my $sequenceRef = shift;
+
+  return unless defined($x);
+  return unless defined($sequenceRef);
+  return unless ref($sequenceRef);
+
+  # Check the input arguments for any code references and use them.
+  my $LessThan        = \&LessThan;
+  my $LessThanEqualTo = \&LessThanEqualTo;
+  @_ and defined(ref($_[0])) and ref($_[0]) eq 'CODE' and
+    $LessThan = shift;
+  @_ and defined(ref($_[0])) and ref($_[0]) eq 'CODE' and
+    $LessThanEqualTo = shift;
+
+  # Get the number of points in the data.
+  my $num = @$sequenceRef;
+
+  # Return -1 if there's no data.
+  if ( $num <= 0 ) {
+    $last_interval_result = 0;
+    return -1;
+  }
+
+  # Use the result from the last time through the subroutine, if it
+  # exists.  Force the result into the range required by the array
+  # size.
+  $last_interval_result = 0 unless defined($last_interval_result);
+
+  # Which side of the data point is x on if there's only one point?
+  if ( $num == 1 ) {
+    $last_interval_result = 0;
+    if ( &$LessThan($x, $sequenceRef->[0]) ) {
+      return -1;
+    }
+    else {
+      return 0;
+    }
+  }
+
+  # Is the point less than the smallest point in the sequence?
+  if ( &$LessThan($x, $sequenceRef->[0]) ) {
+    $last_interval_result = 0;
+    return -1;
+  }
+
+  # Is the point greater than the largest point in the sequence?
+  if ( &$LessThanEqualTo($sequenceRef->[$num-1], $x) ) {
+    return $last_interval_result = $num - 1;
+  }
+
+  # Use the result from the last run as a start for this run.
+  if ( $last_interval_result > $num-1 ) {
+    $last_interval_result = $num - 2;
+  }
+  my $ilo = $last_interval_result;
+  my $ihi = $ilo + 1;
+
+  # Is the new upper ihi beyond the extent of the sequence?
+  if ( $ihi >= $num ) {
+    $ihi = $num - 1;
+    $ilo = $ihi - 1;
+  }
+
+  # If x < sequence(ilo), then decrease ilo to capture x.
+  if ( &$LessThan($x, $sequenceRef->[$ilo]) ) {
+    my $istep = 1;
+    for (;;) {
+      $ihi = $ilo;
+      $ilo = $ihi - $istep;
+      if ( $ilo <= 0 ) {
+	$ilo = 0;
+	last;
+      }
+      if ( &$LessThanEqualTo($sequenceRef->[$ilo], $x) ) {
+	last;
+      }
+      $istep *= 2;
+    }
+  }
+
+  # If x >= sequence(ihi), then increase ihi to capture x.
+  if ( &$LessThanEqualTo($sequenceRef->[$ihi], $x) ) {
+    my $istep = 1;
+    for (;;) {
+      $ilo = $ihi;
+      $ihi = $ilo + $istep;
+      if ( $ihi >= $num-1 ) {
+	$ihi = $num - 1;
+	last;
+      }
+      if ( &$LessThan($x, $sequenceRef->[$ihi]) ) {
+	last;
+      }
+      $istep *= 2;
+    }
+  }
+
+  # Now sequence(ilo) <= x < sequence(ihi).  Narrow the interval.
+  for (;;) {
+    # Find the middle point of the sequence.
+    my $middle = int(($ilo + $ihi)/2);
+
+    # The division above was integer, so if ihi = ilo+1, then
+    # middle=ilo, which tests if x has been trapped.
+    if ( $middle == $ilo ) {
+      $last_interval_result = $ilo;
+      return $ilo;
+    }
+    if ( &$LessThan($x, $sequenceRef->[$middle]) ) {
+      $ihi = $middle;
+    }
+    else {
+      $ilo = $middle;
+    }
+  }
+}
+
+sub linear_interpolate {
+  my $x = shift;
+  return unless defined($x);
+
+  my $X = shift;
+  return unless defined($X);
+  return unless ref($X);
+
+  my $Y = shift;
+  return unless defined($Y);
+  return unless ref($Y);
+
+  my $num_x = @$X;
+  my $num_y = @$Y;
+  return unless $num_x == $num_y;
+
+  # Find where the point to be interpolated lies in the input sequence.
+  # If the point lies outside, then coerce the index value to be legal for
+  # the routine to work.  Remember, this is only an interpreter, not an
+  # extrapolator.
+  my $j = interval_search($x, $X);
+  if ( $j < 0 ) {
+    $j = 0;
+  }
+  elsif ( $j >= $num_x - 1 ) {
+    $j = $num_x - 2;
+  }
+  my $k = $j + 1;
+
+  # Calculate the linear slope between the two points.
+  my $dy = ($Y->[$k] - $Y->[$j]) / ($X->[$k] - $X->[$j]);
+
+  # Use the straight line between the two points to interpolate.
+  my $y  = $dy*($x - $X->[$j]) + $Y->[$j];
+
+  return wantarray ? ($y, $dy) : $y;
+}
 
 sub new {
     #create a SmoothProb object

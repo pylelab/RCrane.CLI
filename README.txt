@@ -29,14 +29,6 @@ using Windows, you may install ActivePerl
 (http://www.activestate.com/activeperl/) or Strawberry Perl
 (http://strawberryperl.com/).
 
-RCrane.CLI also requires the Math::Interpolate and Math::Amoeba Perl modules.
-If using Perl on Linux or OS X, these modules may be installed from:
-  http://search.cpan.org/~bzajac/Math-Interpolate-1.05/lib/Math/Interpolate.pm
-  http://search.cpan.org/~tom/Math-Amoeba-0.05/lib/Math/Amoeba.pm
-If using ActivePerl, these modules may be installed using the Perl Package
-Manager included with ActivePerl.  If using Strawberry Perl, these modules
-may be installed using the interactive CPAN shell.
-
 Once Perl and the necessary modules are installed, RCrane.CLI may be
 installed by simply unzipping the program into any desired directory
 (ex. /usr/local/xtal/rcrane.cli/ or C:\Program Files\RCrane.CLI\).  Users
