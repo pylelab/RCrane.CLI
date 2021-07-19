@@ -1,0 +1,123 @@
+NAME
+    RCrane.CLI - Calculate and build the RNA backbone given phosphate and
+    base atoms
+
+SYNOPSIS
+    rcrane.cli.pl [OPTIONS] PDBFILE
+
+    Options:
+
+       -r=STRING   Build the given conformer string
+   
+       -i=NAME     Alternate method for providing the input PDB file
+       -o=NAME     Prefix for the output filenames
+   
+       -s          Do not build the structure
+       -t          Do not output data tables
+       -x          Format the output tables for Excel
+
+       -h          Print a brief help message and exit
+       -m          Print the full manual
+
+DESCRIPTION
+    RCrane.CLI is designed to aid in crystallographic model building.
+    Specifically, it helps in building the RNA backbone into electron
+    density. To use RCrane.CLI, first build phosphate, base, and C1' atoms
+    and save these coordinates to a PDB file. Using this PDB file as input,
+    RCrane.CLI will automatically construct the RNA backbone and output a
+    PDB containing the constructed molecule.
+
+    RCrane.CLI builds the backbone using a combination of pseudotorsions and
+    the all-atom consensus backbone conformer library. The phosphates and
+    bases are used to calculate pseudotorsions and determine sugar puckers,
+    and these measurements are then used to predict and build the
+    appropriate conformers. For more information, see Keating KS and Pyle
+    AM. Semi-automated model building for RNA crystallography using a
+    directed rotameric approach. Proc Natl Acad Sci U S A, In press (2010).
+
+    By default, RCrane.CLI will output a PDB structure and several csv data
+    tables. See the "-t" and "-s" options for ways to modify this. For an
+    input of struc.pdb, the default output files will be
+
+    struc.built.pdb
+      A PDB file containing a molecule constructed using the most likely
+      conformers
+
+    struc.data.csv
+      A table containing all data used for the conformers predictions:
+      theta', eta', base-phosphate perpendicular distances, C1'-C1'
+      distances, and P-P distances
+
+    struc.probs.csv
+      A table containing the probabilities for each conformer at each suite
+      of the structure
+
+    struc.rots.csv
+      A table containing the three most likely conformers for each suite,
+      along with their sugar puckers. The bottom of this table also contains
+      a conformer string for the most likely conformers.
+
+EXAMPLES
+    rcrane.cli.pl struc.pdb
+      Build and predict conformers for file struc.pdb. Output files
+      struc.built.pdb, struc.data.csv, struc.probs.csv, and struc.rots.csv
+      will be created
+
+    rcrane.cli.pl -t struc.pdb
+      Build and predict conformers for file struc.pdb. Only struc.built.pdb
+      will be output.
+
+    rcrane.cli.pl -r 1a1a1a7r6g1L1f1m1a struc.pdb
+      Build struc.pdb using the specified suites. Note that struc.pdb must
+      contain exactly 9 suites.
+
+OPTIONS
+    -r, --rot=STRING
+            Build the given conformer string instead of predicting
+            conformers. Note that the given conformer string must contain
+            the same number of suites as the input PDB file. Implies "-t".
+
+    -i, --input=FILE
+            Alternate method for providing the input PDB file. If this
+            option is used, then the PDB filename does not need to be given
+            at the end of the arguments.
+
+    -o, --output=PREFIX
+            Prefix for the output filenames. If this option is used, output
+            files will be named prefix.built.pdb, prefix.data.csv,
+            prefix.probs.csv, and prefix.rots.csv.
+
+    -s, --nostruc
+            Do not build the structure. Appropriate conformers will be
+            predicted and output, but not built.
+
+    -t, --notables
+            Do not output the tables containing data about the conformer
+            predictions.
+
+    -x, --excel
+            Format the output .csv data tables for Excel. If this option is
+            not used and the tables are opened in Excel (or OpenOffice.org
+            if the importing defaults are used), then suite names may be
+            incorrectly interpreted as dates - for example, suite 2-3 will
+            be displayed as February 3rd of the current year. This option
+            will protect all suite names using formulas.
+
+    -h, -?, --help
+            Print a brief help message and exit.
+
+    -m, --man
+            Print the full manual and exit.
+
+AUTHOR
+    RCrane.CLI programmed by Kevin Keating, Yale University, 2010.
+    Kevin.Keating@yale.edu
+
+    All publications resulting from use of this program must acknowledge:
+    Keating KS and Pyle AM.  Semiautomated model building for RNA
+    crystallography using a directed rotameric approach.  Proc Natl Acad
+    Sci USA, 107: 8177-8182 (2010).
+
+    RCrane.CLI is copyright 2010, Kevin Keating, and is licensed under the
+    Educational Community License, Version 2.0
+
