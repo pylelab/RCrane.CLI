@@ -1,4 +1,4 @@
-RCrane.CLI, version 1.0.1
+RCrane.CLI, version 1.0.2
 
 OVERVIEW
 
@@ -68,6 +68,9 @@ Additional options are described in MANUAL.txt or by running rcrane.cli.pl -m.
 
 
 CHANGELOG
+
+version 1.0.2
+Remove dependency on perl Math modules.
 
 version 1.0.1
 Changed name from CONDOR.CLI to RCrane.CLI
