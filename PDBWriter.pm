@@ -236,7 +236,7 @@ sub printAtom {
     my $chain    = shift;
     
     my ($resNumNum, $insCode);
-    if ($resNum =~ /^(\d+)([A-Z]?)$/i) {
+    if ($resNum =~ /^([-\d]+)([A-Z]?)$/i) {
         $resNumNum = $1;
         $insCode   = $2;
     }
