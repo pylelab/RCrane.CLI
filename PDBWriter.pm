@@ -241,7 +241,8 @@ sub printAtom {
         $insCode   = $2;
     }
     
-    print {$self->{OUT}} sprintf("ATOM  %5i %-4s %-3s %1s%4i%1s   %8.3f%8.3f%8.3f  1.00 10.00           %s  \n", $self->{atomNum}, " " . $atomName, $resName, $chain, $resNumNum, $insCode, @{$coords}, substr($atomName,0,1));
+    #print {$self->{OUT}} sprintf("ATOM  %5i %-4s %-3s %1s%4i%1s   %8.3f%8.3f%8.3f  1.00 10.00           %s  \n", $self->{atomNum}, " " . $atomName, $resName, $chain, $resNumNum, $insCode, @{$coords}, substr($atomName,0,1));
+    print {$self->{OUT}} sprintf("ATOM  %5i %-4s %3s %1s%4i%1s   %8.3f%8.3f%8.3f  1.00 10.00           %s  \n", $self->{atomNum}, " " . $atomName, $resName, $chain, $resNumNum, $insCode, @{$coords}, substr($atomName,0,1));
     $self->{atomNum}++;
 }
 
