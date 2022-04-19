@@ -78,3 +78,9 @@ Updated PNAS citation
 
 version 1.0
 Initial release
+
+REFERENCE
+
+Keating KS and Pyle AM.  Semiautomated model building for RNA
+crystallography using a directed rotameric approach.  Proc Natl Acad
+Sci USA, 107: 8177-8182 (2010).
